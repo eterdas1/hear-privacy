@@ -1,0 +1,104 @@
+<!-- https://eterdas1.github.io/hear-privacy/email-verified.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verified - Hear</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #BEE7E8 0%, #1E7078 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 24px;
+        }
+        h1 {
+            color: #1E7078;
+            margin: 0 0 16px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin: 0 0 24px;
+        }
+        .btn {
+            display: inline-block;
+            background: #89023E;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 8px;
+        }
+        .btn:hover {
+            background: #6d0231;
+        }
+        .btn-secondary {
+            background: #1E7078;
+        }
+        .btn-secondary:hover {
+            background: #155962;
+        }
+        .desktop-note {
+            margin-top: 24px;
+            padding: 16px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://eterdas1.github.io/hear-privacy/logo.png" alt="Hear Logo" class="logo">
+        <h1>✓ Email Verified!</h1>
+        <p>Your email has been successfully verified. You can now log in to your Hear account.</p>
+        
+        <!-- Mobile: Try to open app -->
+        <a href="hear://auth" class="btn" id="openApp">Open Hear App</a>
+        
+        <!-- Desktop: Show alternative -->
+        <div class="desktop-note" id="desktopNote" style="display: none;">
+            <strong>On desktop?</strong><br>
+            Open the Hear app on your mobile device and log in with your email.
+        </div>
+    </div>
+
+    <script>
+        // Detect if mobile or desktop
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        if (!isMobile) {
+            document.getElementById('desktopNote').style.display = 'block';
+            document.getElementById('openApp').style.display = 'none';
+        } else {
+            // On mobile, try to open app, fallback to app store after 2 seconds
+            document.getElementById('openApp').addEventListener('click', function(e) {
+                setTimeout(function() {
+                    // If app didn't open, could redirect to app store
+                    // window.location = 'https://play.google.com/store/apps/details?id=com.example.hear';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
