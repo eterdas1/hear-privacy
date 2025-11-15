@@ -1,100 +1,79 @@
-<!-- https://eterdas1.github.io/hear-privacy/email-verified.html -->
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verified - Hear</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #BEE7E8 0%, #1E7078 100%);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .container {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .logo {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 24px;
-        }
-        h1 {
-            color: #1E7078;
-            margin: 0 0 16px;
-        }
-        p {
-            color: #666;
-            line-height: 1.6;
-            margin: 0 0 24px;
-        }
-        .btn {
-            display: inline-block;
-            background: #89023E;
-            color: white;
-            padding: 14px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 8px;
-        }
-        .btn:hover {
-            background: #6d0231;
-        }
-        .btn-secondary {
-            background: #1E7078;
-        }
-        .btn-secondary:hover {
-            background: #155962;
-        }
-        .desktop-note {
-            margin-top: 24px;
-            padding: 16px;
-            background: #f5f5f5;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #666;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Email verified</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#f7fafc; color:#111827 }
+    .card{ background:white; padding:24px; border-radius:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); max-width:520px; width:94%; text-align:center }
+    button, a.btn { background:#2563eb; color:#fff; border:none; padding:12px 20px; border-radius:8px; text-decoration:none; display:inline-block; margin-top:12px }
+    .muted{ color:#6b7280 }
+    pre{ background:#f3f4f6; padding:8px; border-radius:6px; overflow:auto }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <img src="https://eterdas1.github.io/hear-privacy/logo.png" alt="Hear Logo" class="logo">
-        <h1>✓ Email Verified!</h1>
-        <p>Your email has been successfully verified. You can now log in to your Hear account.</p>
-        
-        <!-- Mobile: Try to open app -->
-        <a href="hear://auth" class="btn" id="openApp">Open Hear App</a>
-        
-      
+  <div class="card">
+    <h1>You're verified ✅</h1>
+    <p class="muted">We confirmed your email. Tap the button below to open the app.</p>
+
+    <div id="actions">
+      <button id="openApp">Open App</button>
+      <div style="margin-top:12px">
+        <a id="openWeb" class="btn" href="#">Continue in browser</a>
+      </div>
+
+      <p style="margin-top:12px" class="muted">If the app doesn't open, copy the link below into your phone's browser address bar.</p>
+      <pre id="link" style="margin-top:8px">...</pre>
     </div>
 
-    <script>
-        // Detect if mobile or desktop
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        
-        if (!isMobile) {
-            document.getElementById('desktopNote').style.display = 'block';
-            document.getElementById('openApp').style.display = 'none';
-        } else {
-            // On mobile, try to open app, fallback to app store after 2 seconds
-            document.getElementById('openApp').addEventListener('click', function(e) {
-                setTimeout(function() {
-                    // If app didn't open, could redirect to app store
-                    // window.location = 'https://play.google.com/store/apps/details?id=com.example.hear';
-                }, 2000);
-            });
-        }
-    </script>
+    <p style="margin-top:16px" class="muted">If you opened this on desktop or your app isn't installed, use the "Continue in browser" button.</p>
+  </div>
+
+  <script>
+    // This page expects Supabase to send the confirmation URL including token information
+    // Example incoming URL formats:
+    // 1) https://your-site/email_verified.html#access_token=...&type=signup
+    // 2) https://your-site/email_verified.html?access_token=...&type=signup
+    
+    function buildAppDeepLink() {
+      const hash = window.location.hash || '';
+      const search = window.location.search || '';
+      // Prefer fragment (hash) because Supabase may put tokens there
+      const tokenPart = hash || search;
+      // Build app deep link; keep the fragment if present
+      const deep = 'hear://auth' + tokenPart;
+      return deep;
+    }
+
+    function buildBrowserContinueUrl() {
+      // Keep the current URL (it already contains tokens) to continue in browser
+      return window.location.href;
+    }
+
+    const appLink = buildAppDeepLink();
+    const continueUrl = buildBrowserContinueUrl();
+
+    document.getElementById('link').textContent = appLink;
+    document.getElementById('openApp').addEventListener('click', () => {
+      // Try to open the app by navigating to the custom scheme
+      window.location.href = appLink;
+      // Also attempt a small delay then show instructions (some browsers block immediate app open)
+      setTimeout(() => {
+        // no-op; leaving user on the page if app failed to open
+      }, 600);
+    });
+
+    document.getElementById('openWeb').setAttribute('href', continueUrl);
+
+    // Optionally auto-redirect for mobile users
+    (function autoOpen() {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        // try auto-opening the app once
+        window.location.href = appLink;
+      }
+    })();
+  </script>
 </body>
 </html>
